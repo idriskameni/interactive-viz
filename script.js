@@ -1,64 +1,114 @@
-// set the dimensions and margins of the graph
 var margin = {top: 30, right: 30, bottom: 70, left: 60},
-    width = 460 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+width = 460 - margin.left - margin.right,
+height = 400 - margin.top - margin.bottom;
 
-// append the svg object to the body of the page
 var svg = d3.select("#my_dataviz")
-  .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
+.append("svg")
+.attr("width", width + margin.left + margin.right)
+.attr("height", height + margin.top + margin.bottom)
+.append("g")
+.attr("transform",
+      "translate(" + margin.left + "," + margin.top + ")");
 
-// Initialize the X axis
 var x = d3.scaleBand()
-  .range([ 0, width ])
-  .padding(0.2);
+.range([ 0, width ])
+.padding(0.2);
 var xAxis = svg.append("g")
-  .attr("transform", "translate(0," + height + ")")
+.attr("transform", "translate(0," + height + ")")
 
-// Initialize the Y axis
 var y = d3.scaleLinear()
-  .range([ height, 0]);
+.range([ height, 0]);
 var yAxis = svg.append("g")
-  .attr("class", "myYaxis")
+.attr("class", "myYaxis")
 
 
-// A function that create / update the plot for a given variable:
 function update(selectedVar) {
 
-  // Parse the Data
-  d3.csv("data/info_general.csv", function(data) {
+d3.text("data/info_general.csv", function(text) {
 
-    // X axis
-    x.domain(data.map(function(d) { return d.any; }))
-    xAxis.transition().duration(1000).call(d3.axisBottom(x))
+var rows = text.trim().split('\n');
+var columns = rows.shift().split(';');
 
-    // Add Y axis
-    y.domain([0, d3.max(data, function(d) { return +d[selectedVar] }) ]);
-    yAxis.transition().duration(1000).call(d3.axisLeft(y));
+var data = rows.map(function(row) {
+    var values = row.split(';');
+    var obj = {};
 
-    // variable u: map data to existing bars
-    var u = svg.selectAll("rect")
-      .data(data)
+    columns.forEach(function(column, index) {
+        obj[column] = +values[index];
+    });
 
-    // update bars
-    u
-      .enter()
-      .append("rect")
-      .merge(u)
-      .transition()
-      .duration(1000)
-        .attr("x", function(d) { return x(d.group); })
-        .attr("y", function(d) { return y(d[selectedVar]); })
-        .attr("width", x.bandwidth())
-        .attr("height", function(d) { return height - y(d[selectedVar]); })
-        .attr("fill", "#69b3a2")
-  })
+    return obj;
+});
+
+x.domain(data.map(function(d) { return d.any; }))
+xAxis.transition().duration(1000).call(d3.axisBottom(x))
+
+y.domain([0, d3.max(data, function(d) { return +d[selectedVar] }) ]);
+yAxis.transition().duration(1000).call(d3.axisLeft(y));
+
+var labels = svg.append("g").attr("class", "labels");
+
+var u = svg.selectAll("rect")
+  .data(data)
+
+u
+  .enter()
+  .append("rect")
+  .merge(u)
+  .transition()
+  .duration(1000)
+    .attr("x", function(d) { return x(d.any); })
+    .attr("y", function(d) {
+        var value = +d[selectedVar];
+        return isNaN(value) ? 0 : y(value);
+    })
+    .attr("width", x.bandwidth())
+    .attr("height", function(d) {
+        var value = +d[selectedVar];
+        if (isNaN(value)) {
+            return 0;
+        }
+        return height - y(value);
+    })
+    .attr("fill", "#69b3a2");
+
+svg.selectAll(".label").remove();
+
+var labels = svg.selectAll(".label")
+    .data(data)
+    .enter()
+    .append("g")
+    .attr("class", "label");
+
+labels
+    .selectAll("text")
+    .data(data)
+    .enter()
+    .append("text")
+    .attr("x", function (d) {
+        return x(d.any) + x.bandwidth() / 2;
+    })
+    .attr("y", function (d) {
+    var value = +d[selectedVar];
+    return isNaN(value) ? 0 : y(value)
+    })
+    .attr("dy", "-5px")
+    .text(function (d) {
+    var value = +d[selectedVar];
+    return isNaN(value) ? "" : value;
+    })
+    .attr("text-anchor", "middle");
+
+labels
+    .selectAll("text")
+    .filter(function (d) {
+        var value = +d[selectedVar];
+        return isNaN(value) || value === 0;
+    })
+    .remove();
+
+})
 
 }
 
-// Initialize plot
-update('perc_participacio')
+update('votants')
