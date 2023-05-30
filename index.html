@@ -62,8 +62,22 @@
         function update(selectedVar) {
         
           // Parse the Data
-          d3.csv("data/info_general.csv", function(data) {
-        
+          d3.text("data/info_general.csv", function(text) {
+
+            var rows = text.trim().split('\n');
+            var columns = rows.shift().split(';');
+
+            var data = rows.map(function(row) {
+            // Split each row using ';' delimiter
+            var values = row.split(';');
+            // Create an object using column names and converted values
+            var obj = {};
+            columns.forEach(function(column, index) {
+                obj[column] = +values[index];
+            });
+            return obj;
+            });
+
             // X axis
             x.domain(data.map(function(d) { return d.any; }))
             xAxis.transition().duration(1000).call(d3.axisBottom(x))
@@ -71,6 +85,9 @@
             // Add Y axis
             y.domain([0, d3.max(data, function(d) { return +d[selectedVar] }) ]);
             yAxis.transition().duration(1000).call(d3.axisLeft(y));
+
+            // Add labels to the bars
+            var labels = svg.append("g").attr("class", "labels");
         
             // variable u: map data to existing bars
             var u = svg.selectAll("rect")
@@ -83,17 +100,67 @@
               .merge(u)
               .transition()
               .duration(1000)
-                .attr("x", function(d) { return x(d.group); })
-                .attr("y", function(d) { return y(d[selectedVar]); })
+                .attr("x", function(d) { return x(d.any); })
+                .attr("y", function(d) {
+                    var value = +d[selectedVar]; // Convert value to a number
+                    return isNaN(value) ? 0 : y(value); // Check if value is NaN and handle accordingly
+                })
                 .attr("width", x.bandwidth())
-                .attr("height", function(d) { return height - y(d[selectedVar]); })
-                .attr("fill", "#69b3a2")
+                .attr("height", function(d) {
+                    var value = +d[selectedVar];
+                    if (isNaN(value)) {
+                        return 0; // Set height to 0 for NaN values
+                    }
+                    return height - y(value);
+                })
+                .attr("fill", "#69b3a2");
+
+            // Remove existing labels
+            svg.selectAll(".label").remove();
+
+            // Add new labels
+            var labels = svg.selectAll(".label")
+                .data(data)
+                .enter()
+                .append("g")
+                .attr("class", "label");
+
+            // Add labels to the bars
+            labels
+                .selectAll("text")
+                .data(data)
+                .enter()
+                .append("text")
+                .attr("x", function (d) {
+                    return x(d.any) + x.bandwidth() / 2;
+                })
+                .attr("y", function (d) {
+                var value = +d[selectedVar];
+                return isNaN(value) ? 0 : y(value)
+                })
+                .attr("dy", "-5px") // Adjust the vertical position of the labels
+                .text(function (d) {
+                var value = +d[selectedVar];
+                return isNaN(value) ? "" : value; // Show the value if it's a valid number, otherwise show an empty string
+                })
+                .attr("text-anchor", "middle"); // Set the text anchor to the middle for centered alignment
+
+                
+            // Remove labels for bars with height 0
+            labels
+            .selectAll("text")
+            .filter(function (d) {
+                var value = +d[selectedVar];
+                return isNaN(value) || value === 0;
+            })
+            .remove();
+
           })
         
         }
         
         // Initialize plot
-        update('perc_participacio')
+        update('votants')
         
         </script>
 </body>

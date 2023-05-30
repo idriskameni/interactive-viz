@@ -27,3 +27,8 @@ button {
     text-align: center;
     margin-top: 10px;
   }
+
+  #my_dataviz {
+    margin: 0 auto; /* Set left and right margins to "auto" */
+    text-align: center; /* Center the content inside the div */
+  }
