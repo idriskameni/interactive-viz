@@ -19,15 +19,49 @@
     </div>
 
     <br>
+    <hr>
 
     <div class="buttons">
-        <button onclick="update('perc_participacio')">Participació #</button>
-        <button onclick="update('votants')">Participació %</button>
+        <button id="button1">% Participació per provincia</button>
+        <button id="button2">Partits guanyadors per provincia</button>
+        <button id="button3">Repartició escons</button>
     </div>
-    <br>
-    
-    <div id="my_dataviz"></div>
 
+    <hr>
+    <br>
+
+    <div class="flourish-container">
+        <div class="flourish-embed flourish-map" id="visual1" data-src="visualisation/13941162">
+            <script src="https://public.flourish.studio/resources/embed.js"></script>
+        </div>
+        <div class="flourish-embed flourish-map" id="visual2" data-src="visualisation/13971101">
+            <script src="https://public.flourish.studio/resources/embed.js"></script>
+        </div>
+        <div class="flourish-embed flourish-parliament" id="visual3" data-src="visualisation/13971430">
+            <script src="https://public.flourish.studio/resources/embed.js"></script>
+            </div>
+    </div>
+
+
+
+    <!--
+
+    <div class="flourish-container">
+        <div class="flourish-embed flourish-map" data-src="visualisation/13941162">
+            <script src="https://public.flourish.studio/resources/embed.js"></script>
+        </div>
+        <div class="flourish-embed flourish-map" data-src="visualisation/13971101">
+            <script src="https://public.flourish.studio/resources/embed.js"></script>
+        </div>
+    </div>
+
+    <div class="flourish-container">
+        <div class="flourish-embed flourish-parliament" data-src="visualisation/13971430">
+            <script src="https://public.flourish.studio/resources/embed.js"></script>
+        </div>
+    </div>
+
+    -->
     <script src="script.js"></script>
 </body>
 </html>

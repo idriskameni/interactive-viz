@@ -1,5 +1,5 @@
-button {
-    width: 20%;
+.buttons {
+    width: 100%;
     text-align: center;
   }
   
@@ -16,10 +16,10 @@ button {
     margin-bottom: 20px;
   }
   
-  .buttons {
-    width: 100%; 
+  .buttons button {
+    width: 20%;
     text-align: center;
-    margin-bottom: 20px;
+    margin: 5px;
   }
   
   .images {
@@ -28,7 +28,21 @@ button {
     margin-top: 10px;
   }
 
-  #my_dataviz {
-    margin: 0 auto; /* Set left and right margins to "auto" */
-    text-align: center; /* Center the content inside the div */
+  .flourish-container {
+    display: flex;
+    justify-content: center;
+  }
+
+  .flourish-embed.flourish-map {
+    width: 30%;
+    height: auto;
+  }
+
+  .flourish-embed.flourish-parliament {
+    width: 25%;
+    height: auto;
+  }
+  
+  .flourish-embed {
+    display: none;
   }
